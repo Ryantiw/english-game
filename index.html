@@ -194,6 +194,9 @@
     .blue-card { --accent-soft: #dbeaff; }
     .yellow-card { --accent-soft: #fff0b8; }
     .purple-card { --accent-soft: #e8e0ff; }
+    .green-card { --accent-soft: #d9f7e9; }
+    .pink-card { --accent-soft: #ffe0ec; }
+    .orange-card { --accent-soft: #ffe7c7; }
 
     .game-shell {
       margin-top: 26px;
@@ -342,6 +345,13 @@
     .answer-btn.word {
       font-size: clamp(20px, 3.2vw, 27px);
       text-transform: lowercase;
+    }
+
+    .answer-btn.phrase {
+      min-height: 82px;
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      font-size: clamp(17px, 2.7vw, 22px);
+      line-height: 1.35;
     }
 
     .answer-btn:hover:not(:disabled) {
@@ -576,6 +586,21 @@
           <h2>大小寫配對</h2>
           <p>看到大寫找小寫，看到小寫找大寫。</p>
         </button>
+        <button class="mode-card green-card" type="button" data-mode="order">
+          <span class="mode-icon">A→B</span>
+          <h2>字母順序測驗</h2>
+          <p>想一想前後順序，包含大寫與小寫字母。</p>
+        </button>
+        <button class="mode-card pink-card" type="button" data-mode="daily">
+          <span class="mode-icon">💬</span>
+          <h2>日常用語聽力</h2>
+          <p>聽教材中的英語句子，點選正確中文意思。</p>
+        </button>
+        <button class="mode-card orange-card" type="button" data-mode="number">
+          <span class="mode-icon">6–10</span>
+          <h2>數字聽力練習</h2>
+          <p>聽一聽英文數字，點選正確的 6 到 10。</p>
+        </button>
       </div>
       <p class="credit">依據翰林 Hooray 2 Unit 1–4 課程內容製作</p>
     </section>
@@ -618,29 +643,34 @@
       { word: "nose", picture: "👃", unit: 1 },
       { word: "ox", picture: "🐂", unit: 1 },
       { word: "pig", picture: "🐷", unit: 1 },
-      { word: "neck", picture: "👤", unit: 1 },
-      { word: "octopus", picture: "🐙", unit: 1 },
-      { word: "pen", picture: "🖊️", unit: 1 },
       { word: "queen", picture: "👸", unit: 2 },
       { word: "rabbit", picture: "🐰", unit: 2 },
       { word: "sun", picture: "☀️", unit: 2 },
-      { word: "quiet", picture: "🤫", unit: 2 },
-      { word: "red", color: "#ef4444", unit: 2 },
-      { word: "sea", picture: "🌊", unit: 2 },
       { word: "turtle", picture: "🐢", unit: 3 },
       { word: "umbrella", picture: "☂️", unit: 3 },
       { word: "vest", picture: "🦺", unit: 3 },
       { word: "water", picture: "💧", unit: 3 },
-      { word: "toy", picture: "🧸", unit: 3 },
-      { word: "up", picture: "⬆️", unit: 3 },
-      { word: "van", picture: "🚐", unit: 3 },
-      { word: "watch", picture: "⌚", unit: 3 },
       { word: "fox", picture: "🦊", unit: 4 },
       { word: "yo-yo", picture: "🪀", unit: 4 },
-      { word: "zebra", picture: "🦓", unit: 4 },
-      { word: "box", picture: "📦", unit: 4 },
-      { word: "yellow", color: "#facc15", unit: 4 },
-      { word: "zoo", picture: "🦁🐘", two: true, unit: 4 }
+      { word: "zebra", picture: "🦓", unit: 4 }
+    ];
+    const dailyPhrases = [
+      { english: "How are you?", chinese: "你好嗎？" },
+      { english: "I'm fine.", chinese: "我很好。" },
+      { english: "Good afternoon.", chinese: "午安。" },
+      { english: "Come here, please.", chinese: "請過來。" },
+      { english: "Good job!", chinese: "做得好！" },
+      { english: "Thank you.", chinese: "謝謝你。" },
+      { english: "Are you ready?", chinese: "你準備好了嗎？" },
+      { english: "Yes.", chinese: "好了。" },
+      { english: "No.", chinese: "還沒。" }
+    ];
+    const numbers = [
+      { value: "6", english: "six" },
+      { value: "7", english: "seven" },
+      { value: "8", english: "eight" },
+      { value: "9", english: "nine" },
+      { value: "10", english: "ten" }
     ];
 
     const totalRounds = 10;
@@ -720,6 +750,9 @@
       if (state.mode === "sound") renderSoundQuestion();
       if (state.mode === "picture") renderPictureQuestion();
       if (state.mode === "case") renderCaseQuestion();
+      if (state.mode === "order") renderOrderQuestion();
+      if (state.mode === "daily") renderDailyQuestion();
+      if (state.mode === "number") renderNumberQuestion();
     }
 
     function renderSoundQuestion() {
@@ -731,25 +764,25 @@
           <button class="sound-btn" id="soundBtn" type="button" aria-label="播放字母發音">🔊</button>
           <div class="sound-hint">可以重複點擊聆聽</div>
         </div>`;
-      renderAnswers(makeChoices(target, letters), target, false);
-      document.querySelector("#soundBtn").addEventListener("click", () => speakLetter(target));
-      window.setTimeout(() => speakLetter(target), 250);
+      renderAnswers(makeChoices(target, letters), target);
+      document.querySelector("#soundBtn").addEventListener("click", () => speak(target));
+      window.setTimeout(() => speak(target), 250);
     }
 
-    function speakLetter(letter) {
+    function speak(text, rate = 0.72) {
       if (!("speechSynthesis" in window)) {
         feedback.textContent = "這個瀏覽器不支援語音，請改用 Chrome 或 Edge。";
         feedback.className = "feedback try";
         return;
       }
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(letter);
+      const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
       const englishVoice = voices.find(voice => /^en-(US|GB)/i.test(voice.lang))
         || voices.find(voice => /^en/i.test(voice.lang));
       if (englishVoice) utterance.voice = englishVoice;
       utterance.lang = "en-US";
-      utterance.rate = 0.72;
+      utterance.rate = rate;
       utterance.pitch = 1.08;
       utterance.volume = 1;
       window.speechSynthesis.speak(utterance);
@@ -771,7 +804,7 @@
       const sameUnit = vocabulary.filter(value => value.unit === item.unit).map(value => value.word);
       const allWords = vocabulary.map(value => value.word);
       const distractorPool = [...new Set([...sameUnit, ...shuffled(allWords)])];
-      renderAnswers(makeChoices(item.word, distractorPool), item.word, true);
+      renderAnswers(makeChoices(item.word, distractorPool), item.word, "word");
     }
 
     function renderCaseQuestion() {
@@ -785,15 +818,64 @@
         ? "這個大寫字母，要配哪一個小寫字母？"
         : "這個小寫字母，要配哪一個大寫字母？";
       promptZone.innerHTML = `<div class="case-prompt">${shown}</div>`;
-      renderAnswers(makeChoices(target, pool), target, false);
+      renderAnswers(makeChoices(target, pool), target);
     }
 
-    function renderAnswers(choices, correct, words) {
+    function renderOrderQuestion() {
+      const askAfter = Math.random() >= 0.5;
+      const candidates = askAfter ? letters.slice(0, -1) : letters.slice(1);
+      const base = pickNew(candidates);
+      const index = letters.indexOf(base);
+      const answerIndex = askAfter ? index + 1 : index - 1;
+      const useUpper = Math.random() >= 0.5;
+      const shown = useUpper ? base : base.toLowerCase();
+      const targetLetter = letters[answerIndex];
+      const target = useUpper ? targetLetter : targetLetter.toLowerCase();
+      const pool = letters.map(letter => useUpper ? letter : letter.toLowerCase());
+      state.target = target;
+      instruction.textContent = askAfter
+        ? "哪一個字母排在這個字母的後面？"
+        : "哪一個字母排在這個字母的前面？";
+      promptZone.innerHTML = `<div class="case-prompt">${shown}</div>`;
+      renderAnswers(makeChoices(target, pool), target);
+    }
+
+    function renderDailyQuestion() {
+      const item = pickNew(dailyPhrases, value => value.english);
+      state.target = item.chinese;
+      instruction.textContent = "點喇叭聽日常用語，選出正確的中文意思";
+      promptZone.innerHTML = `
+        <div>
+          <button class="sound-btn" id="soundBtn" type="button" aria-label="播放日常用語">🔊</button>
+          <div class="sound-hint">可以重複點擊聆聽</div>
+        </div>`;
+      const meanings = dailyPhrases.map(value => value.chinese);
+      renderAnswers(makeChoices(item.chinese, meanings), item.chinese, "phrase");
+      document.querySelector("#soundBtn").addEventListener("click", () => speak(item.english, 0.78));
+      window.setTimeout(() => speak(item.english, 0.78), 250);
+    }
+
+    function renderNumberQuestion() {
+      const item = pickNew(numbers, value => value.value);
+      state.target = item.value;
+      instruction.textContent = "點喇叭聽英文數字，選出正確答案";
+      promptZone.innerHTML = `
+        <div>
+          <button class="sound-btn" id="soundBtn" type="button" aria-label="播放英文數字">🔊</button>
+          <div class="sound-hint">數字範圍：6 到 10</div>
+        </div>`;
+      const numberValues = numbers.map(value => value.value);
+      renderAnswers(makeChoices(item.value, numberValues), item.value);
+      document.querySelector("#soundBtn").addEventListener("click", () => speak(item.english));
+      window.setTimeout(() => speak(item.english), 250);
+    }
+
+    function renderAnswers(choices, correct, style = "") {
       answers.innerHTML = "";
       choices.forEach(choice => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = `answer-btn${words ? " word" : ""}`;
+        button.className = `answer-btn${style ? ` ${style}` : ""}`;
         button.textContent = choice;
         button.dataset.answer = choice;
         button.addEventListener("click", () => checkAnswer(button, choice, correct));
