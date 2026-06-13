@@ -756,17 +756,23 @@
     }
 
     function renderSoundQuestion() {
-      const target = pickNew(letters);
+      const baseLetter = pickNew(letters);
+      const useUpper = Math.random() >= 0.5;
+      const displayLetters = letters.map(letter => useUpper ? letter : letter.toLowerCase());
+      const target = useUpper ? baseLetter : baseLetter.toLowerCase();
       state.target = target;
-      instruction.textContent = "點喇叭仔細聽，選出你聽到的字母";
+      instruction.textContent = useUpper
+        ? "點喇叭仔細聽，選出你聽到的大寫字母"
+        : "點喇叭仔細聽，選出你聽到的小寫字母";
       promptZone.innerHTML = `
         <div>
           <button class="sound-btn" id="soundBtn" type="button" aria-label="播放字母發音">🔊</button>
           <div class="sound-hint">可以重複點擊聆聽</div>
         </div>`;
-      renderAnswers(makeChoices(target, letters), target);
-      document.querySelector("#soundBtn").addEventListener("click", () => speak(target));
-      window.setTimeout(() => speak(target), 250);
+      renderAnswers(makeChoices(target, displayLetters), target);
+      const spokenLetter = baseLetter.toLowerCase();
+      document.querySelector("#soundBtn").addEventListener("click", () => speak(spokenLetter));
+      window.setTimeout(() => speak(spokenLetter), 250);
     }
 
     function speak(text, rate = 0.72) {
