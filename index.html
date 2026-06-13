@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hooray 2 英語點點樂</title>
+  <style>
+    :root {
+      --ink: #26354a;
+      --muted: #66758a;
+      --cream: #fffaf0;
+      --card: rgba(255, 255, 255, 0.94);
+      --blue: #4f8ff7;
+      --blue-dark: #2f69c7;
+      --yellow: #ffd45a;
+      --green: #48bf91;
+      --red: #ef6a6a;
+      --purple: #8c74e8;
+      --shadow: 0 12px 30px rgba(47, 71, 105, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Arial Rounded MT Bold", "Microsoft JhengHei", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 212, 90, 0.45) 0 90px, transparent 92px),
+        radial-gradient(circle at 92% 17%, rgba(140, 116, 232, 0.2) 0 120px, transparent 122px),
+        linear-gradient(145deg, #e8f6ff 0%, #fff9e8 52%, #ecfff5 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(980px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 20px clamp(16px, 4vw, 36px) 34px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 54px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: clamp(19px, 3vw, 27px);
+      font-weight: 900;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 14px;
+      color: white;
+      background: var(--blue);
+      box-shadow: 0 6px 0 var(--blue-dark);
+    }
+
+    .home-btn {
+      display: none;
+      min-width: 92px;
+      padding: 11px 15px;
+      border: 0;
+      border-radius: 14px;
+      color: var(--ink);
+      background: white;
+      box-shadow: 0 4px 0 #d9e2ef;
+      cursor: pointer;
+    }
+
+    .home-btn:active,
+    .primary-btn:active,
+    .mode-card:active,
+    .answer-btn:active,
+    .sound-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+
+    .screen {
+      display: none;
+      animation: appear 0.28s ease-out;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      padding: clamp(30px, 7vw, 66px) 0 26px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(36px, 8vw, 70px);
+      line-height: 1.08;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      color: var(--blue);
+    }
+
+    .hero p {
+      margin: 16px auto 0;
+      color: var(--muted);
+      font-size: clamp(17px, 3vw, 22px);
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .mode-card {
+      position: relative;
+      min-height: 255px;
+      padding: 26px 20px 22px;
+      overflow: hidden;
+      border: 0;
+      border-radius: 28px;
+      color: var(--ink);
+      text-align: left;
+      background: var(--card);
+      box-shadow: var(--shadow), 0 7px 0 #dce6f3;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .mode-card::after {
+      position: absolute;
+      right: -28px;
+      bottom: -38px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      content: "";
+    }
+
+    .mode-icon {
+      display: grid;
+      width: 82px;
+      height: 82px;
+      margin-bottom: 25px;
+      place-items: center;
+      border-radius: 24px;
+      font-size: 44px;
+      background: var(--accent-soft);
+    }
+
+    .mode-card h2 {
+      margin: 0 0 9px;
+      font-size: 24px;
+    }
+
+    .mode-card p {
+      margin: 0;
+      color: var(--muted);
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .blue-card { --accent-soft: #dbeaff; }
+    .yellow-card { --accent-soft: #fff0b8; }
+    .purple-card { --accent-soft: #e8e0ff; }
+
+    .game-shell {
+      margin-top: 26px;
+    }
+
+    .game-status {
+      display: grid;
+      grid-template-columns: 130px 1fr 130px;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .status-chip {
+      padding: 11px 14px;
+      border-radius: 15px;
+      font-size: 16px;
+      text-align: center;
+      background: white;
+      box-shadow: 0 4px 0 #dce5ef;
+    }
+
+    .progress-track {
+      height: 15px;
+      overflow: hidden;
+      border: 4px solid white;
+      border-radius: 999px;
+      background: #dce5ef;
+      box-shadow: 0 3px 0 #cbd7e4;
+    }
+
+    .progress-fill {
+      width: 10%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green), #76d9a9);
+      transition: width 0.35s ease;
+    }
+
+    .game-card {
+      min-height: 580px;
+      padding: clamp(25px, 5vw, 44px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 32px;
+      text-align: center;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .instruction {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(18px, 3vw, 22px);
+    }
+
+    .prompt-zone {
+      display: grid;
+      min-height: 245px;
+      place-items: center;
+      padding: 20px 0;
+    }
+
+    .sound-btn {
+      display: grid;
+      width: 150px;
+      height: 150px;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      color: white;
+      font-size: 66px;
+      background: linear-gradient(145deg, #66a6ff, var(--blue));
+      box-shadow: 0 10px 0 var(--blue-dark), 0 18px 28px rgba(79, 143, 247, 0.3);
+      cursor: pointer;
+    }
+
+    .sound-hint {
+      margin-top: 18px;
+      color: var(--blue-dark);
+      font-size: 16px;
+    }
+
+    .picture-card {
+      display: grid;
+      width: 230px;
+      height: 210px;
+      place-items: center;
+      border: 5px solid white;
+      border-radius: 34px;
+      font-size: 112px;
+      line-height: 1;
+      background: linear-gradient(145deg, #f3f9ff, #fff6d8);
+      box-shadow: 0 9px 0 #d9e5ef, 0 15px 25px rgba(47, 71, 105, 0.12);
+    }
+
+    .picture-card .two-icons {
+      font-size: 72px;
+      letter-spacing: -12px;
+    }
+
+    .color-picture {
+      width: 125px;
+      height: 125px;
+      border: 8px solid white;
+      border-radius: 50%;
+      box-shadow: 0 6px 15px rgba(38, 53, 74, 0.2);
+    }
+
+    .case-prompt {
+      display: grid;
+      width: 190px;
+      height: 190px;
+      place-items: center;
+      border-radius: 35px;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 125px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(145deg, #9b85ef, #755bd0);
+      box-shadow: 0 10px 0 #5e48ad, 0 16px 28px rgba(117, 91, 208, 0.25);
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      width: min(620px, 100%);
+      margin: 0 auto;
+    }
+
+    .answer-btn {
+      min-height: 72px;
+      padding: 13px 15px;
+      border: 3px solid #dce6f2;
+      border-radius: 19px;
+      color: var(--ink);
+      font-size: clamp(25px, 4vw, 34px);
+      font-weight: 900;
+      background: white;
+      box-shadow: 0 6px 0 #d1dce8;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    }
+
+    .answer-btn.word {
+      font-size: clamp(20px, 3.2vw, 27px);
+      text-transform: lowercase;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      border-color: #9fc5ff;
+      background: #f4f8ff;
+    }
+
+    .answer-btn.correct {
+      border-color: var(--green);
+      color: #17734f;
+      background: #dff8ec;
+      box-shadow: 0 6px 0 #a8dfc7;
+    }
+
+    .answer-btn.wrong {
+      border-color: var(--red);
+      color: #a53c3c;
+      background: #ffe8e8;
+      box-shadow: 0 6px 0 #f0b8b8;
+      animation: shake 0.28s linear;
+    }
+
+    .answer-btn:disabled {
+      cursor: default;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .feedback {
+      min-height: 40px;
+      margin: 18px 0 0;
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .feedback.good { color: #16805a; }
+    .feedback.try { color: #bd4848; }
+
+    .finish {
+      display: grid;
+      min-height: 520px;
+      place-items: center;
+      text-align: center;
+    }
+
+    .finish-icon {
+      font-size: 92px;
+    }
+
+    .finish h2 {
+      margin: 8px 0 4px;
+      font-size: clamp(34px, 7vw, 56px);
+    }
+
+    .finish-score {
+      margin: 8px 0 25px;
+      color: var(--blue-dark);
+      font-size: 25px;
+    }
+
+    .finish-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .primary-btn {
+      min-width: 155px;
+      padding: 15px 20px;
+      border: 0;
+      border-radius: 17px;
+      color: white;
+      font-size: 19px;
+      background: var(--blue);
+      box-shadow: 0 6px 0 var(--blue-dark);
+      cursor: pointer;
+    }
+
+    .primary-btn.secondary {
+      color: var(--ink);
+      background: white;
+      box-shadow: 0 6px 0 #d3deea;
+    }
+
+    .credit {
+      margin: 30px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mode-card {
+        min-height: 175px;
+        padding: 22px 22px 20px 126px;
+      }
+
+      .mode-icon {
+        position: absolute;
+        top: 32px;
+        left: 23px;
+      }
+
+      .game-status {
+        grid-template-columns: 95px 1fr 95px;
+        gap: 9px;
+      }
+
+      .status-chip {
+        padding: 9px 7px;
+        font-size: 14px;
+      }
+
+      .game-card {
+        min-height: 560px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        padding: 12px 12px 24px;
+      }
+
+      .brand-text {
+        font-size: 18px;
+      }
+
+      .home-btn {
+        min-width: 74px;
+        padding: 10px;
+      }
+
+      .hero {
+        padding-top: 32px;
+      }
+
+      .mode-card {
+        min-height: 150px;
+        padding: 18px 15px 16px 104px;
+        border-radius: 23px;
+      }
+
+      .mode-icon {
+        top: 29px;
+        left: 18px;
+        width: 68px;
+        height: 68px;
+        font-size: 37px;
+      }
+
+      .mode-card h2 {
+        font-size: 21px;
+      }
+
+      .game-shell {
+        margin-top: 15px;
+      }
+
+      .game-card {
+        min-height: 530px;
+        padding: 24px 15px;
+        border-radius: 24px;
+      }
+
+      .prompt-zone {
+        min-height: 225px;
+      }
+
+      .picture-card {
+        width: 200px;
+        height: 185px;
+        font-size: 98px;
+      }
+
+      .answers {
+        gap: 11px;
+      }
+
+      .answer-btn {
+        min-height: 67px;
+        border-radius: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">Aa</div>
+        <div class="brand-text">Hooray 2 英語點點樂</div>
+      </div>
+      <button class="home-btn" id="homeBtn" type="button">⌂ 首頁</button>
+    </header>
+
+    <section class="screen active" id="homeScreen">
+      <div class="hero">
+        <h1>點一點，<span>學英語！</span></h1>
+        <p>不用鍵盤，選一個遊戲開始挑戰吧</p>
+      </div>
+
+      <div class="mode-grid">
+        <button class="mode-card blue-card" type="button" data-mode="sound">
+          <span class="mode-icon">🔊</span>
+          <h2>聽音選字母</h2>
+          <p>仔細聽英語發音，點出正確的字母。</p>
+        </button>
+        <button class="mode-card yellow-card" type="button" data-mode="picture">
+          <span class="mode-icon">🖼️</span>
+          <h2>看圖認單字</h2>
+          <p>看看圖片是什麼，點出正確的英文單字。</p>
+        </button>
+        <button class="mode-card purple-card" type="button" data-mode="case">
+          <span class="mode-icon">Aa</span>
+          <h2>大小寫配對</h2>
+          <p>看到大寫找小寫，看到小寫找大寫。</p>
+        </button>
+      </div>
+      <p class="credit">依據翰林 Hooray 2 Unit 1–4 課程內容製作</p>
+    </section>
+
+    <section class="screen" id="gameScreen">
+      <div class="game-shell">
+        <div class="game-status">
+          <div class="status-chip" id="roundLabel">第 1 / 10 題</div>
+          <div class="progress-track" aria-label="遊戲進度">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="status-chip" id="scoreLabel">⭐ 0</div>
+        </div>
+
+        <div class="game-card" id="questionCard">
+          <p class="instruction" id="instruction"></p>
+          <div class="prompt-zone" id="promptZone"></div>
+          <div class="answers" id="answers"></div>
+          <p class="feedback" id="feedback" aria-live="polite"></p>
+        </div>
+
+        <div class="game-card finish" id="finishCard" hidden>
+          <div>
+            <div class="finish-icon" id="finishIcon">🏆</div>
+            <h2 id="finishTitle">太棒了！</h2>
+            <p class="finish-score" id="finishScore"></p>
+            <div class="finish-actions">
+              <button class="primary-btn" id="againBtn" type="button">再玩一次</button>
+              <button class="primary-btn secondary" id="finishHomeBtn" type="button">選其他遊戲</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const letters = "NOPQRSTUVWXYZ".split("");
+    const vocabulary = [
+      { word: "nose", picture: "👃", unit: 1 },
+      { word: "ox", picture: "🐂", unit: 1 },
+      { word: "pig", picture: "🐷", unit: 1 },
+      { word: "neck", picture: "👤", unit: 1 },
+      { word: "octopus", picture: "🐙", unit: 1 },
+      { word: "pen", picture: "🖊️", unit: 1 },
+      { word: "queen", picture: "👸", unit: 2 },
+      { word: "rabbit", picture: "🐰", unit: 2 },
+      { word: "sun", picture: "☀️", unit: 2 },
+      { word: "quiet", picture: "🤫", unit: 2 },
+      { word: "red", color: "#ef4444", unit: 2 },
+      { word: "sea", picture: "🌊", unit: 2 },
+      { word: "turtle", picture: "🐢", unit: 3 },
+      { word: "umbrella", picture: "☂️", unit: 3 },
+      { word: "vest", picture: "🦺", unit: 3 },
+      { word: "water", picture: "💧", unit: 3 },
+      { word: "toy", picture: "🧸", unit: 3 },
+      { word: "up", picture: "⬆️", unit: 3 },
+      { word: "van", picture: "🚐", unit: 3 },
+      { word: "watch", picture: "⌚", unit: 3 },
+      { word: "fox", picture: "🦊", unit: 4 },
+      { word: "yo-yo", picture: "🪀", unit: 4 },
+      { word: "zebra", picture: "🦓", unit: 4 },
+      { word: "box", picture: "📦", unit: 4 },
+      { word: "yellow", color: "#facc15", unit: 4 },
+      { word: "zoo", picture: "🦁🐘", two: true, unit: 4 }
+    ];
+
+    const totalRounds = 10;
+    const state = {
+      mode: "sound",
+      round: 1,
+      score: 0,
+      answered: false,
+      target: null,
+      recent: []
+    };
+
+    const homeScreen = document.querySelector("#homeScreen");
+    const gameScreen = document.querySelector("#gameScreen");
+    const homeBtn = document.querySelector("#homeBtn");
+    const questionCard = document.querySelector("#questionCard");
+    const finishCard = document.querySelector("#finishCard");
+    const instruction = document.querySelector("#instruction");
+    const promptZone = document.querySelector("#promptZone");
+    const answers = document.querySelector("#answers");
+    const feedback = document.querySelector("#feedback");
+    const roundLabel = document.querySelector("#roundLabel");
+    const scoreLabel = document.querySelector("#scoreLabel");
+    const progressFill = document.querySelector("#progressFill");
+
+    function shuffled(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function pickNew(items, key = value => value) {
+      const available = items.filter(item => !state.recent.includes(key(item)));
+      const pool = available.length ? available : items;
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+      state.recent = [key(picked), ...state.recent].slice(0, 4);
+      return picked;
+    }
+
+    function makeChoices(correct, pool, count = 4) {
+      const distractors = shuffled(pool.filter(item => item !== correct)).slice(0, count - 1);
+      return shuffled([correct, ...distractors]);
+    }
+
+    function showScreen(screen) {
+      homeScreen.classList.toggle("active", screen === "home");
+      gameScreen.classList.toggle("active", screen === "game");
+      homeBtn.style.display = screen === "game" ? "block" : "none";
+      if (screen === "home" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function startGame(mode) {
+      state.mode = mode;
+      state.round = 1;
+      state.score = 0;
+      state.answered = false;
+      state.recent = [];
+      questionCard.hidden = false;
+      finishCard.hidden = true;
+      showScreen("game");
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      state.answered = false;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+      roundLabel.textContent = `第 ${state.round} / ${totalRounds} 題`;
+      scoreLabel.textContent = `⭐ ${state.score}`;
+      progressFill.style.width = `${(state.round / totalRounds) * 100}%`;
+
+      if (state.mode === "sound") renderSoundQuestion();
+      if (state.mode === "picture") renderPictureQuestion();
+      if (state.mode === "case") renderCaseQuestion();
+    }
+
+    function renderSoundQuestion() {
+      const target = pickNew(letters);
+      state.target = target;
+      instruction.textContent = "點喇叭仔細聽，選出你聽到的字母";
+      promptZone.innerHTML = `
+        <div>
+          <button class="sound-btn" id="soundBtn" type="button" aria-label="播放字母發音">🔊</button>
+          <div class="sound-hint">可以重複點擊聆聽</div>
+        </div>`;
+      renderAnswers(makeChoices(target, letters), target, false);
+      document.querySelector("#soundBtn").addEventListener("click", () => speakLetter(target));
+      window.setTimeout(() => speakLetter(target), 250);
+    }
+
+    function speakLetter(letter) {
+      if (!("speechSynthesis" in window)) {
+        feedback.textContent = "這個瀏覽器不支援語音，請改用 Chrome 或 Edge。";
+        feedback.className = "feedback try";
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(letter);
+      const voices = window.speechSynthesis.getVoices();
+      const englishVoice = voices.find(voice => /^en-(US|GB)/i.test(voice.lang))
+        || voices.find(voice => /^en/i.test(voice.lang));
+      if (englishVoice) utterance.voice = englishVoice;
+      utterance.lang = "en-US";
+      utterance.rate = 0.72;
+      utterance.pitch = 1.08;
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function renderPictureQuestion() {
+      const item = pickNew(vocabulary, value => value.word);
+      state.target = item.word;
+      instruction.textContent = "看一看圖片，選出正確的英文單字";
+
+      let visual;
+      if (item.color) {
+        visual = `<div class="color-picture" style="background:${item.color}" aria-label="${item.word}"></div>`;
+      } else {
+        visual = `<span class="${item.two ? "two-icons" : ""}" role="img" aria-label="${item.word}">${item.picture}</span>`;
+      }
+      promptZone.innerHTML = `<div class="picture-card">${visual}</div>`;
+
+      const sameUnit = vocabulary.filter(value => value.unit === item.unit).map(value => value.word);
+      const allWords = vocabulary.map(value => value.word);
+      const distractorPool = [...new Set([...sameUnit, ...shuffled(allWords)])];
+      renderAnswers(makeChoices(item.word, distractorPool), item.word, true);
+    }
+
+    function renderCaseQuestion() {
+      const letter = pickNew(letters);
+      const showUpper = Math.random() >= 0.5;
+      const shown = showUpper ? letter : letter.toLowerCase();
+      const target = showUpper ? letter.toLowerCase() : letter;
+      const pool = letters.map(value => showUpper ? value.toLowerCase() : value);
+      state.target = target;
+      instruction.textContent = showUpper
+        ? "這個大寫字母，要配哪一個小寫字母？"
+        : "這個小寫字母，要配哪一個大寫字母？";
+      promptZone.innerHTML = `<div class="case-prompt">${shown}</div>`;
+      renderAnswers(makeChoices(target, pool), target, false);
+    }
+
+    function renderAnswers(choices, correct, words) {
+      answers.innerHTML = "";
+      choices.forEach(choice => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `answer-btn${words ? " word" : ""}`;
+        button.textContent = choice;
+        button.dataset.answer = choice;
+        button.addEventListener("click", () => checkAnswer(button, choice, correct));
+        answers.appendChild(button);
+      });
+    }
+
+    function checkAnswer(button, choice, correct) {
+      if (state.answered) return;
+      state.answered = true;
+      const isCorrect = choice === correct;
+      const buttons = [...answers.querySelectorAll(".answer-btn")];
+      buttons.forEach(item => {
+        item.disabled = true;
+        if (item.dataset.answer === correct) item.classList.add("correct");
+      });
+
+      if (isCorrect) {
+        state.score += 1;
+        feedback.textContent = "答對了，太棒了！ ⭐";
+        feedback.className = "feedback good";
+      } else {
+        button.classList.add("wrong");
+        feedback.textContent = `再記一次，正確答案是 ${correct}`;
+        feedback.className = "feedback try";
+      }
+      scoreLabel.textContent = `⭐ ${state.score}`;
+
+      window.setTimeout(() => {
+        if (state.round >= totalRounds) {
+          finishGame();
+        } else {
+          state.round += 1;
+          nextQuestion();
+        }
+      }, 1250);
+    }
+
+    function finishGame() {
+      questionCard.hidden = true;
+      finishCard.hidden = false;
+      const great = state.score >= 8;
+      const okay = state.score >= 5;
+      document.querySelector("#finishIcon").textContent = great ? "🏆" : okay ? "🌟" : "💪";
+      document.querySelector("#finishTitle").textContent = great ? "太棒了！" : okay ? "做得很好！" : "再挑戰一次！";
+      document.querySelector("#finishScore").textContent = `你得到了 ${state.score} 顆星星，共 ${totalRounds} 題`;
+      progressFill.style.width = "100%";
+    }
+
+    document.querySelectorAll("[data-mode]").forEach(button => {
+      button.addEventListener("click", () => startGame(button.dataset.mode));
+    });
+
+    homeBtn.addEventListener("click", () => showScreen("home"));
+    document.querySelector("#finishHomeBtn").addEventListener("click", () => showScreen("home"));
+    document.querySelector("#againBtn").addEventListener("click", () => startGame(state.mode));
+  </script>
+</body>
+</html>
